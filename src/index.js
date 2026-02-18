@@ -1,6 +1,8 @@
 const express = require('express');
+const multer = require('multer');
 
 const app = express();
+const upload = multer({ storage: multer.memoryStorage() });
 const PORT = process.env.PORT || 3000;
 
 // Middleware
@@ -13,6 +15,25 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// POST /image-to-base64 - Convierte imagen a base64
+app.post('/image-to-base64', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Se requiere un archivo "image"' });
+  }
+  
+  const base64 = req.file.buffer.toString('base64');
+  const mimeType = req.file.mimetype;
+  const dataUrl = `data:${mimeType};base64,${base64}`;
+  
+  res.json({
+    filename: req.file.originalname,
+    mimeType,
+    size: req.file.size,
+    base64,
+    dataUrl
+  });
 });
 
 // Start server
