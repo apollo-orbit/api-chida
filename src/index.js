@@ -17,6 +17,16 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// POST /text-to-base64 - Convierte texto a base64
+app.post('/text-to-base64', (req, res) => {
+  const { text } = req.body;
+  
+  if (!text) {
+    return res.status(400).json({ error: 'Se requiere el campo "text"' });
+  }
+  
+  const base64 = Buffer.from(text, 'utf-8').toString('base64');
+  res.json({ original: text, base64 });
 // POST /image-to-base64 - Convierte imagen a base64
 app.post('/image-to-base64', upload.single('image'), (req, res) => {
   if (!req.file) {
